@@ -1,0 +1,40 @@
+const express=require('express');
+const app=express();
+ const bodyParser=require("body-parser");
+ app.use(bodyParser.json());
+const mongoose=require('mongoose');
+const axios=require("axios")
+require("./Order");
+const Order=mongoose.model("Order");
+mongoose.connect("mongodb+srv://asha:asha123@cluster0.4l41o.mongodb.net/orderServices?retryWrites=true&w=majority",{useNewUrlParser:true,useUnifiedTopology:true},()=>{
+    console.log("sucess");
+});
+
+app.post("/orders",function(req,res){
+    var newOrder={
+        CustomerId:mongoose.Types.ObjectId(req.body.CustomerId),
+        booksId:mongoose.Types.ObjectId(req.body.booksId),
+        initialDate:req.body.initialDate,
+        deliveryDate:req.body.deliveryDate
+    }
+    var order=new Order(newOrder);
+    order.save().then(()=>{
+       console.log("New order created");
+    }).catch((err)=>{
+        if(err){
+            throw error
+        }
+    })
+    res.send("A new order is created")
+});
+
+app.get("/order",(req,res)=>{
+Order.find().then((order)=>{
+res.json(order)
+}).catch(err =>{
+if(err){
+throw err;
+}
+})
+})
+app.listen(7777);
