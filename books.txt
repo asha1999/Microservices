@@ -1,0 +1,73 @@
+const express=require('express');
+const app=express();
+ const bodyParser=require("body-parser");
+ app.use(bodyParser.json());
+const mongoose=require('mongoose');
+
+require("./Books");
+const Books=mongoose.model("Books");
+
+
+mongoose.connect("mongodb+srv://asha:asha123@cluster0.4l41o.mongodb.net/test?retryWrites=true&w=majority",{useNewUrlParser:true,useUnifiedTopology:true},()=>{
+    console.log("sucess");
+});
+
+app.get('/',function(req,res){
+    console.log("This code is working");
+    res.send("Hello there! welcome to mocroservices");
+});
+
+app.post("/books",function(req,res){
+            var newBook={
+                title:req.body.title,
+                author:req.body.author,
+                numberPages:req.body.numberPages
+            }
+            var books=new Books(newBook);
+            books.save().then(()=>{
+               console.log("New Book created");
+            }).catch((err)=>{
+                if(err){
+                    throw error
+                }
+            })
+            res.send("A new Book is created")
+});
+
+app.get("/books",(req,res)=>{
+
+    Books.find().then((books)=>{
+    res.json(books)
+}).catch(err =>{
+    if(err){
+        throw err;
+    }
+})
+})
+app.get("/book/:id",(req,res)=>{
+    Books.findById(req.params.id).then((book)=>{
+        if(book){
+            res.json(book)
+        }
+        else{
+            res.sendStatus(404);
+        }
+    }).catch(error =>
+    {
+        if(error){
+            throw error;
+        }
+    })
+})
+app.delete("/book/:id",(req,res)=>{
+    Books.findOneAndRemove(req.params.id).then(()=>
+    {
+        res.send("Book removed successfully")
+    }).catch((err)=>{
+        if(err){
+            throw err;
+        }
+    })
+})
+
+app.listen(4545);
